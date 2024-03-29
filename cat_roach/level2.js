@@ -28,11 +28,16 @@ class level2 extends Phaser.Scene {
     this.load.spritesheet('electric', 'assets/strongcockroach.png',{ frameWidth:64, frameHeight:64 });
     this.load.spritesheet('heart', 'assets/life.png',{ frameWidth:64, frameHeight:64 });
 
+    this.load.audio("hurt", "assets/hurt.mp3");
+    this.load.audio("collect", "assets/collect.mp3");
 
   }
 
   create() {
     console.log("level2");
+    this.hurtSnd = this.sound.add("hurt");
+    this.collectSnd = this.sound.add("collect");
+
 
     this.anims.create({
       key:'keyAnim',
@@ -194,7 +199,7 @@ this.anims.create({
         x: 10,
         //flipX: true,
         yoyo: true,
-        duration: 1700,
+        duration: 1730,
         repeat: -1
     })
 
@@ -203,7 +208,7 @@ this.anims.create({
       x: 925,
       //flipX: true,
       yoyo: true,
-      duration: 1700,
+      duration: 1730,
       repeat: -1
   })
 
@@ -212,7 +217,7 @@ this.anims.create({
       x: 925,
       //flipX: true,
       yoyo: true,
-      duration: 1700,
+      duration: 1730,
       repeat: -1
   })
 
@@ -221,7 +226,7 @@ this.anims.create({
     x: 10,
     //flipX: true,
     yoyo: true,
-    duration: 1700,
+    duration: 1730,
     repeat: -1
 })
 
@@ -299,6 +304,7 @@ this.physics.add.overlap(this.player, this.electric4, this.hitElectric, null, th
   //call this function when overlap
   collectKey(player, item) {
     console.log("collect key");
+    this.collectSnd.play()
     item.disableBody(true, true); // remove fire
     return false;
     
@@ -306,6 +312,7 @@ this.physics.add.overlap(this.player, this.electric4, this.hitElectric, null, th
 
   collectHeart(player, item) {
     console.log("collect heart");
+    this.collectSnd.play()
     item.disableBody(true, true); // remove fire
     return false;
     
@@ -314,7 +321,9 @@ this.physics.add.overlap(this.player, this.electric4, this.hitElectric, null, th
  // this function is called when player touch the fire
  hitElectric(player, item) {
   console.log("hit electric");
+  this.hurtSnd.play()
   this.cameras.main.shake(200);
+  this.scene.start("gameOver")
   return false;
 }
 

@@ -12,6 +12,10 @@ class level1 extends Phaser.Scene {
     preload() {
       // Step 1, load JSON
       this.load.tilemapTiledJSON("level1", "assets/level1.tmj");
+      this.load.audio("hurt", "assets/hurt.mp3");
+      this.load.audio("collect", "assets/collect.mp3");
+      this.load.audio("attack", "assets/attack.mp3");
+
   
       // Step 2 : Preload any images here
   
@@ -22,6 +26,7 @@ class level1 extends Phaser.Scene {
       this.load.image("carpetIMG", "assets/Carpet.png");
       this.load.image("defimonIMG", "assets/defimon3.png");
       this.load.image("tileandstoneIMG", "assets/TileAndStone.png");
+      this.load.image("life", "assets/heart.png");
     
       
 
@@ -29,11 +34,20 @@ class level1 extends Phaser.Scene {
       this.load.spritesheet('spray', 'assets/spray1.png',{ frameWidth:32, frameHeight:32 });
       this.load.spritesheet('cockroach', 'assets/cockroach.png',{ frameWidth:64.5, frameHeight:64 });
       this.load.spritesheet('electric', 'assets/strongcockroach.png',{ frameWidth:64, frameHeight:64 });
+      this.load.spritesheet('attack', 'assets/bullet.png',{ frameWidth:64, frameHeight:64 });
      
     }
   
     create() {
       console.log("level1");
+
+      console.log("life:", window.heart);
+      console.log("cockroach:", window.cockroach);
+
+      this.hurtSnd = this.sound.add("hurt");
+      this.collectSnd = this.sound.add("collect");
+      this.attackSnd = this.sound.add("attack");
+    
 
       this.anims.create({
         key:'sprayAnim',
@@ -188,7 +202,53 @@ class level1 extends Phaser.Scene {
         this.player = this.physics.add.sprite(start.x, start.y, "gen").setScale(1.4)
         window.player = this.player
 
-        
+         //hearts
+      this.life1 = this.add
+      .image(50, 40, "life")
+      .setScale(1.5)
+      .setScrollFactor(0)
+      .setVisible(false);
+    this.life2 = this.add
+      .image(100, 40, "life")
+      .setScale(1.5)
+      .setScrollFactor(0)
+      .setVisible(false);
+    this.life3 = this.add
+      .image(150, 40, "life")
+      .setScale(1.5)
+      .setScrollFactor(0)
+      .setVisible(false);
+
+    if (window.heart >= 3) {
+      this.life1.setVisible(true);
+      this.life2.setVisible(true);
+      this.life3.setVisible(true);
+    } 
+     else if (window.heart == 2) {
+      this.life1.setVisible(true);
+      this.life2.setVisible(true);
+    }
+     else if (window.heart == 1) {
+      this.life1.setVisible(true);
+    } 
+
+
+        var attackLeft = this.input.keyboard.addKey('z');
+        var attackRight = this.input.keyboard.addKey('x');
+          
+        attackLeft.on('down', function(){
+          this.attackLeft()
+          }, this);
+  
+        attackRight.on('down', function(){
+          this.attackRight()
+        }, this);
+
+        this.attack=this.physics.add.sprite(this.player.x, this.player.y,'attack');
+        this.attack.setVisible(false)
+
+      window.attack = this.attack
+
     this.physics.world.bounds.width = this.groundLayer.width;
     this.physics.world.bounds.height = this.groundLayer.height;
 
@@ -216,10 +276,10 @@ class level1 extends Phaser.Scene {
     // in create, add tweens  
 this.tweens.add({
     targets: this.electric,
-    y: 770,
+    y: 970,
     //flipX: true,
     yoyo: true,
-    duration: 1000,
+    duration: 1050,
     repeat: -1
 })
 
@@ -228,7 +288,7 @@ this.tweens.add({
     y: 110,
     //flipX: true,
     yoyo: true,
-    duration: 1500,
+    duration: 1200,
     repeat: -1
 })
 
@@ -246,7 +306,11 @@ this.physics.add.overlap(this.player, this.spray, this.collectSpray, null, this)
 this.physics.add.overlap(this.player, this.electric, this.hitElectric, null, this);   
 this.physics.add.overlap(this.player, this.electric2, this.hitElectric, null, this);    
 this.physics.add.overlap(this.player, this.electric3, this.hitElectric, null, this);   
-       
+this.physics.add.overlap(this.player, this.cockroach, this.hitCockroach, null, this);
+this.physics.add.overlap(this.player, this.cockroach2, this.hitCockroach, null, this);
+this.physics.add.overlap(this.player, this.cockroach3, this.hitCockroach, null, this);
+this.physics.add.overlap(this.player, this.cockroach4, this.hitCockroach, null, this);
+
         // create the arrow keys
         this.cursors = this.input.keyboard.createCursorKeys();
         
@@ -275,6 +339,7 @@ this.physics.add.overlap(this.player, this.electric3, this.hitElectric, null, th
         .setOffset(12,22)
 
         this.player.setCollideWorldBounds(true);  // don't go out of the this.map 
+        
         
 
     } // end of create //
@@ -307,8 +372,8 @@ this.physics.add.overlap(this.player, this.electric3, this.hitElectric, null, th
         if (
             this.player.y > 439 &&
             this.player.y < 586 &&
-            this.player.x > 952 
-      
+            this.player.x > 952
+            
            ) {
              console.log("lobby");
              this.lobby();
@@ -317,9 +382,93 @@ this.physics.add.overlap(this.player, this.electric3, this.hitElectric, null, th
         
        
     } // end of update // 
+
+    attackLeft() {
+        console.log('attack left')
+    
+        this.attack.x = this.player.x
+        this.attack.y = this.player.y
+            
+        this.attackSnd.play();
+    
+        this.attack.setVisible(true)
+        this.attack.body.setEnable(true)
+         
+        this.attack.body.setVelocityX(-500)
+     
+      }
+    
+    attackRight() {
+        console.log('attack right')
+    
+        this.attack.x = this.player.x
+        this.attack.y = this.player.y
+    
+        this.attackSnd.play();
+    
+        this.attack.setVisible(true)
+        this.attack.body.setEnable(true)
+     
+        this.attack.body.setVelocityX(500)
+
+        // deduct zombie
+    window.cockroach--;
+
+    // remove the zombie
+    this.cockroach.disableBody(true, true);
+    
+      }
+
+      minusLife(player, cockroach) {
+        console.log("minus life");
+    
+        // deduct live
+        window.heart--;
+    
+    
+        // shake screen
+        this.cameras.main.shake(300);
+    
+        // deduct zombie
+        window.cockroach--;
+        
+        
+        // remove the zombie
+        cockroach.disableBody(true, true);
+    
+        if (window.heart == 2) {
+          this.life3.setVisible(false);
+        } 
+         else if (window.heart == 1) {
+          this.life2.setVisible(false);
+        } 
+         else if (window.heart == 0) {
+          this.life1.setVisible(false);
+          console.log("GAME OVER");
+          this.scene.stop('level1');
+          this.scene.start("gameOver");
+        }
+      }
+
+      killCockroach(attack,cockroach) {
+        console.log("Attack hit cockroach");
+    
+        this.attackSnd.play();
+    
+        attack.disableBody(true,true);
+        cockroach.disableBody(true,true);
+    
+        // deduct zombie
+        window.cockroach--;
+    
+      }
+      
+    
+
  //call this function when overlap
         collectSpray(player, item) {
             console.log("collect spray");
+            this.collectSnd.play()
             item.disableBody(true, true); // remove fire
             return false;
             
@@ -328,9 +477,21 @@ this.physics.add.overlap(this.player, this.electric3, this.hitElectric, null, th
 // this function is called when player touch the fire
  hitElectric(player, item) {
     console.log("hit electric");
+    this.hurtSnd.play()
     this.cameras.main.shake(200);
+
+    this.scene.start("gameOver")
     return false;
   }
+
+  hitCockroach(player, item) {
+    console.log("hit cockroach");
+    this.hurtSnd.play()
+    this.cameras.main.shake(15);
+    this.scene.start("gameOver")
+    return false;
+  }
+  
 
           lobby(player, tile) {
             console.log("lobby function");

@@ -10,7 +10,7 @@ let config = {
         }
     },
     backgroundColor: '#000000',
-    scene: [lobby, level1, level2, level3],
+    scene: [mainScene, storylineScene, lobby, level1, level2, level3, gameOver],
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH

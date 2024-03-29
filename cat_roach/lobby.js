@@ -13,22 +13,28 @@ class lobby extends Phaser.Scene {
 
     this.load.image("genericIMG", "assets/1_Generic_32x32.png");
     this.load.image("basementIMG", "assets/14_Basement_32x32.png");
-    this.load.image(
-      "systemIMG",
-      "assets/17_Visibile_Upstairs_System_32x32.png"
-    );
+    this.load.image("systemIMG","assets/17_Visibile_Upstairs_System_32x32.png");
     this.load.image("jailIMG", "assets/18_Jail_32x32.png");
     this.load.image("buildingIMG", "assets/Buildings32x32.png");
     this.load.image("carpetIMG", "assets/Carpet.png");
     this.load.image("defimonIMG", "assets/defimon3.png");
+    this.load.image("gameintro", "assets/gameintro.jpg");
+    this.load.image("life", "assets/heart.png");
 
     this.load.spritesheet("gen", "assets/cat.png", {
       frameWidth: 32,
       frameHeight: 32,
     });
+
+    
+
   }
 
   create() {
+
+
+    console.log ("this.life",this.life)
+
     console.log("lobby");
 
     this.anims.create({
@@ -151,6 +157,9 @@ class lobby extends Phaser.Scene {
     this.physics.add.collider(this.player, this.stair2);
 
     this.player.setCollideWorldBounds(true); // don't go out of the this.map
+
+
+
   } // end of create //
 
   update() {
