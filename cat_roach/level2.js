@@ -21,12 +21,18 @@ class level2 extends Phaser.Scene {
     this.load.image("buildingIMG", "assets/Buildings32x32.png");
     this.load.image("carpetIMG", "assets/Carpet.png");
     this.load.image("defimonIMG", "assets/defimon3.png");
+    this.load.image("life", "assets/heart.png");
 
     this.load.spritesheet("gen", "assets/cat.png", {frameWidth: 32,frameHeight: 32,});
     this.load.spritesheet('key', 'assets/key.png',{ frameWidth:32, frameHeight:32 });
     this.load.spritesheet('cockroach', 'assets/cockroach.png',{ frameWidth:64.5, frameHeight:64 });
     this.load.spritesheet('electric', 'assets/strongcockroach.png',{ frameWidth:64, frameHeight:64 });
     this.load.spritesheet('heart', 'assets/life.png',{ frameWidth:64, frameHeight:64 });
+    this.load.spritesheet("attack", "assets/bullet.png", {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    
 
     this.load.audio("hurt", "assets/hurt.mp3");
     this.load.audio("collect", "assets/collect.mp3");
@@ -34,6 +40,10 @@ class level2 extends Phaser.Scene {
   }
 
   create() {
+    console.log("life:", window.heart);
+    console.log("cockroach:", window.cockroach);
+    
+
     console.log("level2");
     this.hurtSnd = this.sound.add("hurt");
     this.collectSnd = this.sound.add("collect");
@@ -169,15 +179,77 @@ this.anims.create({
       .setScale(1.4);
     window.player = this.player;
 
+
+ //hearts
+ this.life1 = this.add
+ .image(50, 40, "life")
+ .setScrollFactor(0)
+ .setVisible(false);
+ this.life2 = this.add
+ .image(100, 40, "life")
+ .setScrollFactor(0)
+ .setVisible(false);
+ this.life3 = this.add
+ .image(150, 40, "life")
+ .setScrollFactor(0)
+ .setVisible(false);
+
+ if (window.heart >= 3) {
+   this.life1.setVisible(true);
+   this.life2.setVisible(true);
+   this.life3.setVisible(true);
+ } 
+  else if (window.heart == 2) {
+   this.life1.setVisible(true);
+   this.life2.setVisible(true);
+ } 
+  else if (window.heart == 1) {
+   this.life1.setVisible(true);
+ } 
+
+
+var attackLeft = this.input.keyboard.addKey("z");
+var attackRight = this.input.keyboard.addKey("x");
+
+attackLeft.on(
+  "down",
+  function () {
+    this.attackLeft();
+  },
+  this
+);
+
+attackRight.on(
+  "down",
+  function () {
+    this.attackRight();
+  },
+  this
+);
+
+this.attack = this.physics.add.sprite(
+  this.player.x,
+  this.player.y,
+  "attack"
+).setScale(0.5);
+this.attack.setVisible(false);
+
+window.attack = this.attack;
+
     this.physics.world.bounds.width = this.ground.width;
     this.physics.world.bounds.height = this.ground.height;
 
     // this.player = this.physics.add.sprite(100, 100, "gen").setScale(1.7);
     // window.player = this.player;
 
+    
+    
+
     // load objects from the map
     let key = map.findObject("objectLayer", (obj) => obj.name === "key");
     let heart = map.findObject("objectLayer", (obj) => obj.name === "life");
+    let heart2 = map.findObject("objectLayer", (obj) => obj.name === "life2");
+    let heart3 = map.findObject("objectLayer", (obj) => obj.name === "life3");
     let electric = map.findObject("objectLayer", (obj) => obj.name === "electric");
     let electric2 = map.findObject("objectLayer", (obj) => obj.name === "electric2");
     let electric3 = map.findObject("objectLayer", (obj) => obj.name === "electric3");
@@ -186,6 +258,8 @@ this.anims.create({
    
     this.key = this.physics.add.sprite(key.x, key.y, "key").play("keyAnim").setScale(1.5);
     this.heart = this.physics.add.sprite(heart.x, heart.y, "heart").play("heartAnim");
+    this.heart2 = this.physics.add.sprite(heart2.x, heart2.y, "heart").play("heartAnim");
+    this.heart3 = this.physics.add.sprite(heart3.x, heart3.y, "heart").play("heartAnim");
     this.electric = this.physics.add.sprite(electric.x, electric.y, "electric").play("electric-leftAnim");
     this.electric2 = this.physics.add.sprite(electric2.x, electric2.y, "electric").play("electric-rightAnim");
     this.electric3 = this.physics.add.sprite(electric3.x, electric3.y, "electric").play("electric-rightAnim");
@@ -230,9 +304,68 @@ this.anims.create({
     repeat: -1
 })
 
+this.physics.add.overlap(
+  this.player,
+  this.electric,
+  this.minusLife,
+  null,
+  this
+);
+this.physics.add.overlap(
+  this.player,
+  this.electric2,
+  this.minusLife,
+  null,
+  this
+);
+this.physics.add.overlap(
+  this.player,
+  this.electric3,
+  this.minusLife,
+  null,
+  this
+);
+this.physics.add.overlap(
+  this.player,
+  this.electric,
+  this.minusLife,
+  null,
+  this
+);
+this.physics.add.overlap(
+  this.player,
+  this.electric2,
+  this.minusLife,
+  null,
+  this
+);
+this.physics.add.overlap(
+  this.player,
+  this.electric3,
+  this.minusLife,
+  null,
+  this
+);
+this.physics.add.overlap(
+  this.player,
+  this.electric4,
+  this.minusLife,
+  null,
+  this
+);
+this.physics.add.overlap(
+  this.attack,
+  [this.cockroach, this.cockroach2, this.cockroach3, this.cockroach4],
+  this.killCockroach,
+  null,
+  this
+);
+
 // When object overlap with player, call the this.collectFire function
 this.physics.add.overlap(this.player, this.key, this.collectKey, null, this);
 this.physics.add.overlap(this.player, this.heart, this.collectHeart, null, this);
+this.physics.add.overlap(this.player, this.heart2, this.collectHeart, null, this);
+this.physics.add.overlap(this.player, this.heart3, this.collectHeart, null, this);
 this.physics.add.overlap(this.player, this.electric, this.hitElectric, null, this);
 this.physics.add.overlap(this.player, this.electric2, this.hitElectric, null, this);
 this.physics.add.overlap(this.player, this.electric3, this.hitElectric, null, this);
@@ -269,6 +402,10 @@ this.physics.add.overlap(this.player, this.electric4, this.hitElectric, null, th
     this.physics.world.bounds.width = this.ground.width;
     this.physics.world.bounds.height = this.ground.height;
 
+   
+
+
+
     this.player.setCollideWorldBounds(true); // don't go out of the this.map
   } // end of create //
 
@@ -290,23 +427,84 @@ this.physics.add.overlap(this.player, this.electric4, this.hitElectric, null, th
       this.player.anims.stop();
     }
 
-    if (
-      this.player.x > 485 &&
-      this.player.x < 541 &&
-      this.player.y < 88 
-  
-     ) {
-       console.log("lobby");
-       this.lobby();
+    if (this.player.x > 485 && this.player.x < 541 && this.player.y < 88&&window.key==1) {
+       console.log("level3");
+       this.level3();
   }
     
   } // end of update //
+  minusLife(player, electric) {
+    console.log("minus life");
+
+    // deduct live
+    window.heart--;
+
+    // sound
+ this.hurtSnd.play();
+
+    // shake screen
+    this.cameras.main.shake(300);
+
+    // deduct zombie
+    window.electric--;
+
+    // remove the zombie
+   electric.disableBody(true, true);
+
+    if (window.heart == 2) {
+      this.life3.setVisible(false);
+    } else if (window.heart == 1) {
+      this.life2.setVisible(false);
+    } else if (window.heart == 0) {
+      this.life1.setVisible(false);
+      console.log("GAME OVER");
+      this.scene.stop("level2");
+      this.scene.start("gameOver");
+    }
+  }
+  
+  attackLeft() {
+    
+    console.log("attack left");
+
+    this.attack.x = this.player.x;
+    this.attack.y = this.player.y;
+
+    this.attackSnd.play();
+
+    this.attack.setVisible(true);
+    this.attack.body.setEnable(true);
+
+    this.attack.body.setVelocityX(-500);
+  }
+
+  attackRight() {
+    console.log("attack right");
+
+    this.attack.x = this.player.x;
+    this.attack.y = this.player.y;
+
+    this.attackSnd.play();
+
+    this.attack.setVisible(true);
+    this.attack.body.setEnable(true);
+
+    this.attack.body.setVelocityX(500);
+
+    // deduct cockroach
+    window.cockroach--;
+
+    // remove the cockroach
+    this.cockroach.disableBody(true, true);
+  }
+  
+  
   //call this function when overlap
   collectKey(player, item) {
     console.log("collect key");
     this.collectSnd.play()
     item.disableBody(true, true); // remove fire
-    return false;
+    window.key = 1;
     
   }
 
@@ -314,22 +512,29 @@ this.physics.add.overlap(this.player, this.electric4, this.hitElectric, null, th
     console.log("collect heart");
     this.collectSnd.play()
     item.disableBody(true, true); // remove fire
-    return false;
+
+    window.heart++;
+    console.log("life: ", window.heart);
+    if (window.heart > 3){
+        window.heart = 3;
+    }
+
+    if (window.heart == 3) {
+      this.life3.setVisible(true);
+    } 
+     else if (window.heart == 2) {
+      this.life2.setVisible(true);
+    } 
+     else if (window.heart == 1) {
+      this.life1.setVisible(true);
+    }
     
   }
 
- // this function is called when player touch the fire
- hitElectric(player, item) {
-  console.log("hit electric");
-  this.hurtSnd.play()
-  this.cameras.main.shake(200);
-  this.scene.start("gameOver")
-  return false;
-}
 
-  lobby(player, tile) {
-    console.log("lobby function");
-    this.scene.start("lobby",);
+  level3(player, tile) {
+    console.log("level3ruleScene");
+    this.scene.start("level3ruleScene",);
  }
 
 }

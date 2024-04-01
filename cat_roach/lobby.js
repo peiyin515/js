@@ -19,13 +19,15 @@ class lobby extends Phaser.Scene {
     this.load.image("carpetIMG", "assets/Carpet.png");
     this.load.image("defimonIMG", "assets/defimon3.png");
     this.load.image("gameintro", "assets/gameintro.jpg");
-    this.load.image("life", "assets/heart.png");
-
+    
     this.load.spritesheet("gen", "assets/cat.png", {
       frameWidth: 32,
       frameHeight: 32,
     });
+    this.load.image("life", "assets/heart.png");
+    this.load.spritesheet('heart', 'assets/life.png',{ frameWidth:64, frameHeight:64 });
 
+    this.load.audio("collect", "assets/collect.mp3");
     
 
   }
@@ -33,9 +35,19 @@ class lobby extends Phaser.Scene {
   create() {
 
 
-    console.log ("this.life",this.life)
+    console.log("life:", window.heart);
 
     console.log("lobby");
+
+    this.collectSnd = this.sound.add("collect");
+
+    this.anims.create({
+      key:'heartAnim',
+      frames:this.anims.generateFrameNumbers('heart',
+      { start:0, end:1 }),
+      frameRate:5,
+      repeat:-1
+  });
 
     this.anims.create({
       key: "gen-up",
@@ -104,6 +116,7 @@ class lobby extends Phaser.Scene {
     this.stair = map.createLayer("stair", tilesArray, 0, 0);
     this.stair2 = map.createLayer("stair2", tilesArray, 0, 0);
 
+
     var key2Down = this.input.keyboard.addKey(50);
 
     key2Down.on(
@@ -131,6 +144,85 @@ class lobby extends Phaser.Scene {
 
     this.physics.world.bounds.width = this.ground.width;
     this.physics.world.bounds.height = this.ground.height;
+
+  //hearts
+  this.life1 = this.add
+  .image(50, 40, "life")
+
+  .setScrollFactor(0)
+  .setVisible(false);
+this.life2 = this.add
+  .image(100, 40, "life")
+
+  .setScrollFactor(0)
+  .setVisible(false);
+this.life3 = this.add
+  .image(150, 40, "life")
+
+  .setScrollFactor(0)
+  .setVisible(false);
+
+if (window.heart >= 3) {
+  this.life1.setVisible(true);
+  this.life2.setVisible(true);
+  this.life3.setVisible(true);
+} else if (window.heart == 2) {
+  this.life1.setVisible(true);
+  this.life2.setVisible(true);
+} else if (window.heart == 1) {
+  this.life1.setVisible(true);
+}
+
+this.physics.add.overlap(
+  this.player,
+  this.electric,
+  this.minusLife,
+  null,
+  this
+);
+this.physics.add.overlap(
+  this.player,
+  this.electric2,
+  this.minusLife,
+  null,
+  this
+);
+this.physics.add.overlap(
+  this.player,
+  this.electric3,
+  this.minusLife,
+  null,
+  this
+);
+this.physics.add.overlap(
+  this.player,
+  this.cockroach,
+  this.minusLife,
+  null,
+  this
+);
+this.physics.add.overlap(
+  this.player,
+  this.cockroach2,
+  this.minusLife,
+  null,
+  this
+);
+this.physics.add.overlap(
+  this.player,
+  this.cockroach3,
+  this.minusLife,
+  null,
+  this
+);
+this.physics.add.overlap(
+  this.player,
+  this.cockroach4,
+  this.minusLife,
+  null,
+  this
+);
+
 
     // create the arrow keys
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -163,6 +255,10 @@ class lobby extends Phaser.Scene {
   } // end of create //
 
   update() {
+
+    
+
+
     if (this.cursors.left.isDown) {
       this.player.setVelocityX(-160);
       this.player.anims.play("gen-left", true);
@@ -186,47 +282,58 @@ class lobby extends Phaser.Scene {
         this.player.x < 6 
   
        ) {
-         console.log("level1");
-         this.level1();
+        console.log("level1");
+        this.level1();
+       
   }
       
-  if (
-    this.player.x > 421 &&
-    this.player.x < 472 &&
-    this.player.y > 938 
+//   if (
+//     this.player.x > 421 &&
+//     this.player.x < 472 &&
+//     this.player.y > 938 
 
-   ) {
-     console.log("level2");
-     this.level2();
-}
+//    ) {
+//      console.log("level2");
+//      this.level2();
+// }
 
 
-if (
-  this.player.y > 471 &&
-  this.player.y < 522 &&
-  this.player.x > 952 
+// if (
+//   this.player.y > 471 &&
+//   this.player.y < 522 &&
+//   this.player.x > 952 
 
- ) {
-   console.log("level3");
-   this.level3();
-}
+//  ) {
+//    console.log("level3");
+//    this.level3();
+   
+   
+// }
+
+
+
+
 
       
    } // end of update //
+  
+
+  
+
   // Function to jump to room1
    level1(player, tile) {
-     console.log("level1 function");
-     this.scene.start("level1",);
+     console.log("level1rule");
+     this.scene.start("level1ruleScene",);
   }
 
-  level2(player, tile) {
-    console.log("level2 function");
-    this.scene.start("level2",);
- }
+//   level2(player, tile) {
+//     console.log("level2 function");
+//     this.scene.start("level2",);
+//  }
 
- level3(player, tile) {
-  console.log("level3 function");
-  this.scene.start("level3",);
-}
+//  level3(player, tile) {
+//   console.log("level3 function");
+//   this.scene.start("level3",);
+// }
 
 }

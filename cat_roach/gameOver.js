@@ -18,7 +18,7 @@ class gameOver extends Phaser.Scene {
 
       this.add.image(0, 0, 'gameover').setOrigin(0, 0);
 
-      window.cockroach = 20;
+      window.cockroach =8;
       window.heart = 3;
 
       var spaceDown = this.input.keyboard.addKey('SPACE');
