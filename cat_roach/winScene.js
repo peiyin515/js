@@ -6,7 +6,7 @@ class winScene extends Phaser.Scene {
     }
   
     preload() {
-        this.load.image('winScene','assets/WinScene.jpg');
+        this.load.image('winScene','assets/winScene.jpg');
         this.load.audio("win", "assets/victory.mp3");
     }
   
@@ -16,7 +16,7 @@ class winScene extends Phaser.Scene {
   
         this.winGameSnd = this.sound.add("win");
   
-        this.add.image(0, 0, 'WinScene').setOrigin(0, 0)
+        this.add.image(0, 0, 'winScene').setOrigin(0, 0)
         console.log("This is winScene");
   
         window.cockroach = 8;
