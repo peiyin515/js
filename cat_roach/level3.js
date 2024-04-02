@@ -460,7 +460,7 @@ var attackLeft = this.input.keyboard.addKey("z");
 
     
     // enemy follow after player
-    this.physics.moveToObject(this.electric, this.player, 380, 4000);
+    this.physics.moveToObject(this.electric, this.player, 250, 5200);
     this.physics.moveToObject(this.electric2, this.player, 380, 4000);
     
 
